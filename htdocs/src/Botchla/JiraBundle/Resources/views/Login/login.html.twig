@@ -1,17 +1,49 @@
+{% extends "BotchlaJiraBundle::base.html.twig" %}
+
+{% block title %}BotchlaJira : Issues{% endblock %}
+{% block body %}
+
 {% if error %}
-    <div>{{ error.message }}</div>
+    <div class="alert">{{ error.message }}</div>
 {% endif %}
 
-<form action="{{ path('login_check') }}" method="post">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="_username" value="{{ last_username }}" />
+<h1>Please login</h1>
+<hr class="soften" />
+<form action="" method="post" class="form-horizontal">
+    <div class="control-group">
+        <label for="username" class="control-label">Username:</label>
+        <div class="controls">
+            <input type="text" id="username" name="_username" value="{{ last_username }}" />
+        </div>
+    </div>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="_password" />
+    <div class="control-group">
+        <label for="password" class="control-label">Password:</label>
+        <div class="controls">
+            <input type="password" id="password" name="_password" />
+        </div>
+    </div>
 
-    <input type="checkbox" id="remember_me" name="_remember_me" checked />
-    <label for="remember_me">Keep me logged in</label>
+    <div class="control-group">
+        <label for="jiralocation" class="control-label">Jira-Location:</label>
+        <div class="controls">
+            <input type="text" id="jiralocation" name="jiralocation" value="{{ jiralocation }}" />
+        </div>
+    </div>
+
+    <div class="control-group">
+        <div class="controls">
+            <label for="remember_me">Keep me logged in</label><input type="checkbox" id="remember_me" name="_remember_me" checked />
+        </div>
+    </div>
 
 
-    <input type="submit" name="login" />
+
+    <div class="control-group">
+        <div class="controls">
+            <input type="submit" name="login" class="btn btn-large btn-primary" />
+        </div>
+    </div>
+
 </form>
+{% endblock %}

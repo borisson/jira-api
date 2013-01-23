@@ -1,0 +1,6 @@
+parameters:
+    jira_user_provider.class: Botchla\JiraBundle\Security\User\JiraUserProvider
+
+services:
+    jira_user_provider:
+        class: "%jira_user_provider.class%"
