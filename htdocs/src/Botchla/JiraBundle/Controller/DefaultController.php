@@ -11,8 +11,16 @@ class DefaultController extends Controller
     private $LOGIN = ''; # username
     private $PASSWORD = ''; #password
 
+
+    public function __construct()
+    {
+        if (!isset($JIRA_URL)) {
+            throw $this->createNotFoundException('JIRA url is not set');
+        }
+    }
+
     /**
-     * @Route("/project")
+     * @Route("project")
      * @Template("BotchlaJiraBundle:Projects:index.html.twig")
      */
     public function projectAction()
@@ -22,8 +30,8 @@ class DefaultController extends Controller
         $projects = $this->doCurl($this->JIRA_URL.'project');
 
         return array(
-          'name' => 'Jira-test',
-          'result' => $projects
+            'name' => 'Jira-test',
+            'result' => $projects
         );
     }
 

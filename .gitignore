@@ -1,0 +1,7 @@
+.idea
+.project
+.settings
+nbproject
+.vagrant
+.rsync_cache
+htdocs/app/cache
