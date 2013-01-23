@@ -1,0 +1,42 @@
+body {
+    padding-top: 60px;
+}
+td.small {
+  max-width: 160px;
+  width: 160px;
+}
+
+/* worklog */
+.IssueWorklog {
+  max-width: 250px;
+  width: 250px;
+}
+  .worklogTitle {
+    border-bottom: 1px solid #ccc;
+    padding: .2em .4em;
+  }
+  .worklogtime {
+    font-weight: bold;
+    font-style: italic;
+    float: right;
+  }
+  .worklogauthor {
+    font-weight: bold;
+    display: block;
+    float: left;
+  }
+  .worklogcomment {
+    color: #222;
+    font-size: .9em;
+    line-height: 1em;
+    display: none;
+    padding: .2em .4em;
+  }
+    .worklogcomment.active {
+      display: block;
+    }
+    .worklogTimeUpdate {
+      display: block;
+      font-style: italic;
+      margin-top: .5em;
+    }

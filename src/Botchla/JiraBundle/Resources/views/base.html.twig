@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block head %}
+    <title>{% block title %} welcome {% endblock %}</title>
+    {% endblock %}
+
+    <!-- Le styles -->
+    <link href="{{ asset('bundles/JiraBundle/css/bootstrap.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('bundles/JiraBundle/css/bootstrap-responsive.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('bundles/JiraBundle/css/custom.css') }}" rel="stylesheet" />
+
+    <!-- jQuery -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  </head>
+
+  <body data-spy="scroll" data-target=".bs-docs-sidebar">
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="./index.html">JiraBundle</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li>
+                <a href="./project"{% if path(app.request.attributes.get('_route'))=='/project' %} class="active" {% endif %}>Projects</a>
+              </li>
+              <li>
+                <a href="#" onclick="return false;">Issues</a>
+              </li>
+              <li>
+                <a href="./today">Issues - updated today</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div class="container">
+    {% block body %}
+    This be body block
+    {% endblock %}
+  </div>
+  <!-- javascripts -->
+  <script type="text/javascript" src="{{ asset('bundles/JiraBundle/js/bootstrap.min.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('bundles/JiraBundle/js/Jiracustom.js') }}"></script>
+  </body>
+</html>

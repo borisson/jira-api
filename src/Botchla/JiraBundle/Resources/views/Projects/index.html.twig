@@ -1,0 +1,18 @@
+{% extends "BotchlaJiraBundle::base.html.twig" %}
+
+{% block title %}BotchlaJira : Projects{% endblock %}
+{% block body %}
+    <h1>Projecten</h1>
+    <p>Overzicht van alle projecten</p>
+    <table class="table table-condensed table-striped">
+    {% for project in result %}
+        <tr>
+          <td class="small"> <a href="./issue/{{ project.key }}">{{ project.key }}</a></td>
+          <td>{{ project.name }}</td>
+          <td class="actions"></td>
+        </tr>
+    {% else %}
+        <caption>No projects have been found.</caption>
+    {% endfor %}
+    </table>
+{% endblock %}
