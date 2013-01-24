@@ -5,6 +5,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Botchla\JiraBundle\Security\User;
+
 class DefaultController extends Controller
 {
     private $JIRA_URL = ''; # jira instance location http://myjira.example.com/rest/api/2/
@@ -14,6 +16,7 @@ class DefaultController extends Controller
 
     public function __construct()
     {
+
         if (!isset($JIRA_URL)) {
             throw $this->createNotFoundException('JIRA url is not set');
         }
