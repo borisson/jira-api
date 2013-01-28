@@ -12,12 +12,14 @@ class JiraUserProvider implements UserProviderInterface
     {
         // make a call to your webservice here
         $userData = true;
-        // pretend it returns an array on success, false if there is no user
 
+        // pretend it returns an array on success, false if there is no user
         if ($userData) {
             $password = '...';
             $username = 'test.test';
             $jira_url = 'http://jira.example.com/';
+            $salt     = 'tests';
+            $roles    = array();
 
             return new JiraUser($username, $password, $jira_url, $salt, $roles);
         }

@@ -9,7 +9,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
-use Botchla\JiraBundle\Security\User;
+use Botchla\JiraBundle\Security\User\JiraUserProvider;
+
 
 class LoginController extends Controller
 {
@@ -30,9 +31,9 @@ class LoginController extends Controller
 
         // get post
         if ( count( $request->request->all() ) > 0 ) {
-            var_dump($request->request->all());
-            $jiraUser = new JiraUserProvider();
-            $user = $jiraUser->loadUserByUsername( $request->request->get('_username') );
+            $data = $request->request->all();
+            print_r($data);
+            $jiraUser = new JiraUserProvider($data['_username'], $data['_password'], $data['jiralocation']);
         }
 
 
