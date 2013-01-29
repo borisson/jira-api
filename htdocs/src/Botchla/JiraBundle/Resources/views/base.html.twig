@@ -26,17 +26,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="./index.html">JiraBundle</a>
+          <a class="brand" href="#">JiraBundle</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li>
-                <a href="./project"{% if path(app.request.attributes.get('_route'))=='/project' %} class="active" {% endif %}>Projects</a>
+                <a href="/project">Projects</a>
               </li>
               <li>
-                <a href="#" onclick="return false;">Issues</a>
-              </li>
-              <li>
-                <a href="./today">Issues - updated today</a>
+                <a href="/today">Issues - updated today</a>
               </li>
             </ul>
           </div>

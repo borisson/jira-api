@@ -1,6 +1,7 @@
 {% extends "BotchlaJiraBundle::base.html.twig" %}
 
 {% block title %}BotchlaJira : Issues{% endblock %}
+
 {% block body %}
     <h1>Issues</h1>
     <p>Overzicht van alle issues</p>
@@ -11,24 +12,6 @@
           <td>{{ issue.fields.summary }}</td>
           <td width="25"></td>
           <td class="actions"></td>
-          <td>
-            <div class="IssueWorklog">
-            {% for worklog in issue.IssueWorklog.worklogs %}
-              <div class="worklogItem">
-                <div class="worklogTitle clearfix">
-                  <span class="worklogauthor">{{ worklog.author.displayName}}</span>
-                  <span class="worklogtime">{{ worklog.timeSpentSeconds / 60 / 60 }} uur</span>
-                </div>
-                <div class="worklogcomment">
-                  {{ worklog.comment|nl2br }}
-                  <span class="worklogTimeUpdate"> {{ worklog.updated|date('Y-m-d H:i') }} </span>
-                </div>
-              </div>
-            {% else %}
-              <strng>No worklog</strong>
-            {% endfor %}
-          </div>
-          </td>
         </tr>
     {% else %}
         <caption>No issues have been found.</caption>

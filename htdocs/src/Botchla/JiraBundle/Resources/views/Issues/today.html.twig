@@ -3,7 +3,8 @@
 {% block title %}BotchlaJira : Issues - today{% endblock %}
 {% block body %}
     <h1>Issues</h1>
-    <p>Overzicht van alle issues</p>
+    <h2>Time spent today: {{ totaltime }}</h2>
+    <p>Overzicht van alle issues waar vandaag tijd op is gelogd</p>
     <table class="table table-condensed table-striped">
     {% for issue in result %}
         <tr>
@@ -13,7 +14,7 @@
           <td class="actions"></td>
           <td>
             <div class="IssueWorklog">
-            {% for worklog in issue.IssueWorklog.worklogs %}
+            {% for worklog in issue.IssueWorklog %}
               <div class="worklogItem">
                 <div class="worklogTitle clearfix">
                   <span class="worklogauthor">{{ worklog.author.displayName}}</span>
