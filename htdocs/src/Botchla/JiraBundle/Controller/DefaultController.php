@@ -34,7 +34,7 @@ class DefaultController extends Controller
      */
     public function projectAction()
     {
-        $projects = $this->doCurl($this->JIRA_URL.'project');
+        $projects = $this->curlGet($this->JIRA_URL.'project');
 
         return array(
             'name' => 'Jira-test',
@@ -44,15 +44,48 @@ class DefaultController extends Controller
 
     /**
      * @Route("/project/{abbr}")
-     * @Template("BotchlaJiraBundle:Issues:issues.html.twig")
+     * @Template("BotchlaJiraBundle:Projects:issues.html.twig")
      */
     public function projectDetailAction($abbr = null)
     {
-        $issues = $this->doCurl($this->JIRA_URL.'search?jql=project="'.$abbr.'"+AND+assignee="'.$this->LOGIN.'"');
+        $issues = $this->curlGet($this->JIRA_URL.'search?jql=project="'.$abbr.'"+AND+assignee="'.$this->LOGIN.'"');
 
         return array(
-          'name' => 'Jira-test',
           'result' => $issues->issues
+        );
+    }
+
+
+    /**
+     * @Route("/worklog/create")
+     * @Template("BotchlaJiraBundle:Issues:createlog.html.twig")
+     */
+    public function createWorklog()
+    {
+        $newWorklog = array();
+        $newWorklog['author']['name'] = $this->LOGIN;
+        $newWorklog['updateAuthor']['name'] = $this->LOGIN;
+        $newWorklog['comment'] = 'API comment';
+        $newWorklog['timeSpentSeconds'] = 120;
+        $data_string = json_encode($newWorklog);
+
+        $curlUrl = $this->JIRA_URL . 'issue/'. "TEAMB-82" .'/worklog';
+
+        $userNamePassWord = $this->LOGIN.':'.$this->PASSWORD;
+
+        $ch = curl_init($curlUrl);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_USERPWD, $userNamePassWord);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+        $output = curl_exec($ch);
+        curl_close($ch);
+
+        return array(
+          'name' => 'Jira-test'
         );
     }
 
@@ -64,7 +97,7 @@ class DefaultController extends Controller
     public function todayAction()
     {
 
-        $issues = $this->doCurl($this->JIRA_URL.'search?jql=updatedDate>startOfDay()+AND+updatedDate<endOfDay()+AND+(status+changed+by+"'.$this->LOGIN.'"+OR+assignee="'.$this->LOGIN.'")');
+        $issues = $this->curlGet($this->JIRA_URL.'search?jql=updatedDate>startOfDay()+AND+updatedDate<endOfDay()+AND+(status+changed+by+"'.$this->LOGIN.'"+OR+assignee="'.$this->LOGIN.'")');
 
         $totaltime = 0;
         $output_issues = array();
@@ -72,7 +105,7 @@ class DefaultController extends Controller
             foreach( $issues->issues as $k => $issue_list) {
                 // generate url
                 $worklogurl = $this->JIRA_URL.'issue/'.$issue_list->key.'/worklog';
-                $worklog    = $this->doCurl($worklogurl);
+                $worklog    = $this->curlGet($worklogurl);
 
                 $output_issues[$issue_list->key] = $issue_list;
 
@@ -106,7 +139,7 @@ class DefaultController extends Controller
      * @param  string   $url    url to curl to
      * @return stdClass         result object
      */
-    private function doCurl($url) {
+    private function curlGet($url) {
 
         // set username | password
         $userNamePassWord = $this->LOGIN.':'.$this->PASSWORD;
