@@ -1,0 +1,29 @@
+{% extends "BotchlaJiraBundle::base.html.twig" %}
+
+{% block title %}BotchlaJira : Issues{% endblock %}
+
+{% block body %}
+    <h1>Issues</h1>
+    <p>Overzicht van alle issues voor het project: {{ project.name }}</p>
+    <p>{{ project.description}}</p>
+    <table class="table table-condensed table-striped">
+    {% for issue in result %}
+        <tr>
+          <td class="small">{{ issue.key }}</td>
+          <td>{{ issue.fields.summary }}</td>
+          <td width="25"></td>
+          <td width="400">
+            {% for worklog in issue.IssueWorklog %}
+              <em>{{ worklog.author.displayName}}</em>: {{ (worklog.timeSpentSeconds / 60 / 60 )|number_format(2) }} uur<br />
+              {{ worklog.comment|nl2br }}<br />
+            {% else %}
+              <strong>No worklog</strong>
+            {% endfor %}
+          </div>
+          </td>
+        </tr>
+    {% else %}
+        <caption>No issues have been found.</caption>
+    {% endfor %}
+    </table>
+{% endblock %}

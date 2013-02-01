@@ -1,0 +1,37 @@
+{% extends "BotchlaJiraBundle::base.html.twig" %}
+
+{% block title %}BotchlaJira : Issues - create issue{% endblock %}
+{% block body %}
+    <h1>Issues <small>This page can create a new issue.</small></h1>
+
+    <form action="" method="post" class="form-horizontal">
+
+        <div class="control-group">
+            <label for="issuename" class="control-label">Issue:</label>
+            <div class="controls">
+                <input type="text" id="issuename" name="issuename" value="" />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="time" class="control-label">Tijd:</label>
+            <div class="controls">
+                <input type="text" id="time" name="time" value="" />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="comment" class="control-label">Opmerking:</label>
+            <div class="controls">
+                <textarea rows="3"></textarea>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="controls">
+                <input type="submit" name="login" class="btn btn-primary" />
+            </div>
+        </div>
+
+    </form>
+{% endblock %}

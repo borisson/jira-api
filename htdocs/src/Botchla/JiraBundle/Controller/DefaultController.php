@@ -60,29 +60,40 @@ class DefaultController extends Controller
      * @Route("/worklog/create")
      * @Template("BotchlaJiraBundle:Issues:createlog.html.twig")
      */
-    public function createWorklog()
+    public function createWorklogAction()
     {
         $newWorklog = array();
         $newWorklog['author']['name'] = $this->LOGIN;
         $newWorklog['updateAuthor']['name'] = $this->LOGIN;
         $newWorklog['comment'] = 'API comment';
         $newWorklog['timeSpentSeconds'] = 120;
-        $data_string = json_encode($newWorklog);
 
         $curlUrl = $this->JIRA_URL . 'issue/'. "TEAMB-82" .'/worklog';
 
-        $userNamePassWord = $this->LOGIN.':'.$this->PASSWORD;
+        // $curlResult = $this->curlPost($curlUrl, $newWorklog);
 
-        $ch = curl_init($curlUrl);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        curl_setopt($ch, CURLOPT_USERPWD, $userNamePassWord);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
-        $output = curl_exec($ch);
-        curl_close($ch);
+        return array(
+          'name' => 'Jira-test'
+        );
+    }
+
+
+    /**
+     * @Route("/issue/create")
+     * @Template("BotchlaJiraBundle:Issues:createissue.html.twig")
+     */
+    public function createIssueAction()
+    {
+        $newIssue = array();
+        $newIssue['fields']['project']['key'] = 'TEAMB';
+        $newIssue['fields']['summary'] = 'This is a test.';
+        $newIssue['fields']['assignee']['name'] = $this->LOGIN;
+        $newIssue['fields']['reporter']['name'] = $this->LOGIN;
+        $newIssue['fields']['issuetype']['id'] = 7;
+
+        $curlUrl = $this->JIRA_URL . 'issue/';
+
+        // $curlResult = $this->curlPost($curlUrl, $newIssue);
 
         return array(
           'name' => 'Jira-test'
@@ -134,6 +145,48 @@ class DefaultController extends Controller
         );
     }
 
+
+    /**
+     * @Route("/project/export/{abbr}")
+     * @Template("BotchlaJiraBundle:Projects:issuesdetails.html.twig")
+     */
+    public function projectExportAction($abbr = null)
+    {
+        $issues = $this->curlGet($this->JIRA_URL.'search?jql=project="'.$abbr.'"');
+        $project = $this->curlGet($this->JIRA_URL.'project/'.$abbr);
+
+        $totaltime = 0;
+        $output_issues = array();
+        if (count($issues) > 0) {
+            foreach( $issues->issues as $k => $issue_list) {
+                // generate url
+                $worklogurl = $this->JIRA_URL.'issue/'.$issue_list->key.'/worklog';
+                $worklog    = $this->curlGet($worklogurl);
+
+                $output_issues[$issue_list->key] = $issue_list;
+
+                // loop over worklogs
+                if ( isset($worklog->worklogs) && count($worklog->worklogs) > 0 ) {
+                    foreach ($worklog->worklogs as $value) {
+                        $output_issues[$issue_list->key]->IssueWorklog[] = $value;
+                        $totaltime += $value->timeSpentSeconds;
+                    }
+                }
+                if (!isset($output_issues[$issue_list->key]->IssueWorklog)) {
+                    $output_issues[$issue_list->key]->IssueWorklog = null;
+                }
+            }
+        }
+
+        $totaltimeFormatted = $this->formatTime($totaltime);
+
+        return array(
+          'result' => $output_issues,
+          'project' => $project,
+          'totaltime' => $totaltimeFormatted
+        );
+    }
+
     /**
      * private function, do a curl action to JIRA
      * @param  string   $url    url to curl to
@@ -145,18 +198,48 @@ class DefaultController extends Controller
         $userNamePassWord = $this->LOGIN.':'.$this->PASSWORD;
         $userNamePassWord64 = base64_encode($userNamePassWord);
 
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_USERPWD, $userNamePassWord);
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+        // start curl
+        $curlHandle = curl_init();
+        curl_setopt($curlHandle, CURLOPT_USERPWD, $userNamePassWord);
+        curl_setopt($curlHandle, CURLOPT_URL, $url);
+        curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curlHandle, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($curlHandle, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curlHandle, CURLOPT_SSL_VERIFYHOST, 0);
 
-        $result = (curl_exec($curl));
+        $result = (curl_exec($curlHandle));
         $result_object = json_decode($result);
-        curl_close($curl);
+        curl_close($curlHandle);
         return $result_object;
+    }
+
+
+    /**
+     * private function, do a curl POST action to JIRA
+     * @param  string   $url            url to curl to
+     * @param  mixed    $curlData       data to be posted, array or stdClass
+     * @return stdClass                 result object
+     */
+    private function curlPost($url, $curlData) {
+        $data_string = json_encode($curlData);
+
+        // set username | password
+        $userNamePassWord = $this->LOGIN.':'.$this->PASSWORD;
+        $userNamePassWord64 = base64_encode($userNamePassWord);
+
+        // start curl
+        $curlHandle = curl_init($url);
+        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($curlHandle, CURLOPT_USERPWD, $userNamePassWord);
+        curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curlHandle, CURLOPT_BINARYTRANSFER, true);
+        curl_setopt($curlHandle, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curlHandle, CURLOPT_POST, 1);
+        curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $data_string);
+        $result = curl_exec($curlHandle);
+        curl_close($curlHandle);
+
+        return $result;
     }
 
     /**
