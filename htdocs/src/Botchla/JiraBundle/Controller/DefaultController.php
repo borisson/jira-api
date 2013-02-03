@@ -2,16 +2,20 @@
 namespace Botchla\JiraBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Botchla\JiraBundle\Security\User;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class DefaultController extends Controller
 {
     private $JIRA_URL = ''; # jira instance location http://myjira.example.com/rest/api/2/
     private $LOGIN = ''; # username
     private $PASSWORD = ''; #password
+
+    private $session;
 
 
     public function __construct()
@@ -26,6 +30,11 @@ class DefaultController extends Controller
         if ($this->JIRA_URL == '') {
             throw $this->createNotFoundException('JIRA url is not set');
         }
+
+        // create session
+        $session = new Session();
+        $session->start();
+        $this->session = $session;
     }
 
     /**
@@ -60,8 +69,14 @@ class DefaultController extends Controller
      * @Route("/worklog/create")
      * @Template("BotchlaJiraBundle:Issues:createlog.html.twig")
      */
-    public function createWorklogAction()
+    public function createWorklogAction(Request $request)
     {
+        if ($request->getMethod() == 'POST') {
+            echo 'true';
+        } else {
+            echo 'test';
+            print $this->session->get('LastTimer');
+        }
         $newWorklog = array();
         $newWorklog['author']['name'] = $this->LOGIN;
         $newWorklog['updateAuthor']['name'] = $this->LOGIN;
@@ -187,6 +202,70 @@ class DefaultController extends Controller
         );
     }
 
+
+    /**
+     * @Route("/timer")
+     * @Template("BotchlaJiraBundle:Timer:timerpage.html.twig")
+     */
+    public function timerAction($abbr = null)
+    {
+        $start_time = $this->session->get('timer');
+
+        // if timer is set & time is positive
+        if ($start_time > 0) {
+            $current_time   = date('U');
+            $diff_time      = ( $current_time - $start_time );
+
+            $timerFormatted = $this->formatTime($diff_time);
+        } else {
+            $timerFormatted = '00:00';
+        }
+
+        return array(
+            'time_timer' => $timerFormatted
+        );
+    }
+
+
+    /**
+     * @Route("/timer/start/")
+     */
+    public function timerStartAction($abbr = null)
+    {
+        // set new timer
+        $newTimerStart = date('U');
+
+        // set timer in session
+        $this->session->set('timer', $newTimerStart);
+
+        // return redirect
+        return $this->redirect($this->generateUrl('botchla_jira_default_timer'));
+    }
+
+
+    /**
+     * @Route("/timer/stop/")
+     * @Template("BotchlaJiraBundle:Timer:timerpage.html.twig")
+     */
+    public function timerStopAction($abbr = null)
+    {
+        // calculate diff time
+        $current_time = date('U');
+        $start_time   = $this->session->get('timer');
+        $diff_time    = ( $current_time - $start_time );
+
+        // reset timer
+        $this->session->set('timer' , 0);
+        print $diff_time;
+
+        // set timespent in session
+        $this->session->set('LastTimer', $diff_time);
+
+        // return redirect
+        return $this->redirect($this->generateUrl('botchla_jira_default_createworklog'));
+    }
+
+
     /**
      * private function, do a curl action to JIRA
      * @param  string   $url    url to curl to
@@ -251,8 +330,13 @@ class DefaultController extends Controller
         $hours = 0;
         $mins = 0;
 
+        // split up time
         $hours = floor($seconds / 3600);
         $mins  = floor(($seconds - ($hours*3600)) / 60);
+
+        // correctly format it
+        $hours = sprintf('%02d' , $hours);
+        $mins = sprintf('%02d' , $mins);
 
         return $hours.':'.$mins;
     }

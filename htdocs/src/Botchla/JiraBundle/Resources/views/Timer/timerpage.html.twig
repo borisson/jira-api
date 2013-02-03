@@ -1,0 +1,11 @@
+{% extends "BotchlaJiraBundle::base.html.twig" %}
+
+{% block title %}BotchlaJira : Projects{% endblock %}
+{% block body %}
+    <h1>Timer</h1>
+    <p>This is the timer page &raquo; You can start and stop timers here.</p>
+    <div class="well well-small">
+        <h2> {{ time_timer }} </h2>
+    </div>
+    <a href="timer/start/" class="btn btn-success">Start timer</a> | <a href="timer/stop/" class="btn btn-warning">Stop timer</a>
+{% endblock %}

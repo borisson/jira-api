@@ -11,8 +11,11 @@
         <tr>
           <td class="small">{{ issue.key }}</td>
           <td>{{ issue.fields.summary }}</td>
-          <td width="25"></td>
-          <td width="400">
+          <td>{{ issue.fields.description }}</td>
+          <td><img src="{{ issue.fields.issuetype.iconUrl }}" alt="{{ issue.fields.issuetype.name }}" title="{{ issue.fields.issuetype.name }}" /></td>
+          <td><img src="{{ issue.fields.priority.iconUrl }}" alt="{{ issue.fields.priority.name }}" title="{{ issue.fields.priority.name }}" /></td>
+          <td><img src="{{ issue.fields.status.iconUrl }}" alt="{{ issue.fields.status.name }}" title="{{ issue.fields.status.name }}" />&nbsp;{{ issue.fields.status.name }}</td>
+          <td>
             {% for worklog in issue.IssueWorklog %}
               <em>{{ worklog.author.displayName}}</em>: {{ (worklog.timeSpentSeconds / 60 / 60 )|number_format(2) }} uur<br />
               {{ worklog.comment|nl2br }}<br />
