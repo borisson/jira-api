@@ -72,11 +72,11 @@ class DefaultController extends Controller
     public function createWorklogAction(Request $request)
     {
         if ($request->getMethod() == 'POST') {
-            echo 'true';
+            $time = $request->request->get('time');
         } else {
-            echo 'test';
-            print $this->session->get('LastTimer');
+            $time = $this->session->get('LastTimer');
         }
+
         $newWorklog = array();
         $newWorklog['author']['name'] = $this->LOGIN;
         $newWorklog['updateAuthor']['name'] = $this->LOGIN;
@@ -88,7 +88,8 @@ class DefaultController extends Controller
         // $curlResult = $this->curlPost($curlUrl, $newWorklog);
 
         return array(
-          'name' => 'Jira-test'
+          'name' => 'Jira-test',
+          'time' => $time
         );
     }
 
