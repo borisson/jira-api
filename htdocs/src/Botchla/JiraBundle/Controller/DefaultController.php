@@ -176,7 +176,7 @@ class DefaultController extends Controller
     public function jiraCsvExportAction($abbr = NULL) {
         $exportarray = $this->generateExport($abbr);
 
-        $filename = "jiraexport_".date("Y_m_d_His").".csv";
+        $filename = $exportarray['project']->name."_".date("Y_m_d_H.i")."_export.csv";
 
         $response = $this->render('BotchlaJiraBundle:Projects:csvexport.html.twig', array('data' => $exportarray['result'], 'totaltime'=>$exportarray['totaltime']));
         $response->headers->set('Content-Type', 'text/csv');
