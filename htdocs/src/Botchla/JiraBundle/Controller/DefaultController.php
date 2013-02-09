@@ -38,7 +38,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/project")
+     * @Route("/project", name="project")
      * @Template("BotchlaJiraBundle:Projects:index.html.twig")
      */
     public function projectAction()
@@ -117,7 +117,7 @@ class DefaultController extends Controller
 
 
     /**
-     * @Route("/today")
+     * @Route("/today", name="today")
      * @Template("BotchlaJiraBundle:Issues:today.html.twig")
      */
     public function todayAction()
@@ -204,7 +204,7 @@ class DefaultController extends Controller
 
 
     /**
-     * @Route("/timer")
+     * @Route("/timer", name="timer")
      * @Template("BotchlaJiraBundle:Timer:timerpage.html.twig")
      */
     public function timerAction($abbr = null)
