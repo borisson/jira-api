@@ -4,7 +4,7 @@
 
 {% block body %}
     <h1>Issues</h1>
-    <p>Overzicht van alle issues voor het project: {{ project.name }}</p>
+    <p>Overzicht van alle issues voor het project: {{ project.name }} | <a href="{{ url('csvexport',{'abbr' : project.key }) }}">Opslaan als CSV</a></p>
     <p>{{ project.description}}</p>
     <table class="table table-condensed table-striped">
     {% for issue in result %}
