@@ -38,7 +38,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/project")
+     * @Route("/project", name="project")
      * @Template("BotchlaJiraBundle:Projects:index.html.twig")
      */
     public function projectAction()
@@ -52,7 +52,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/project/{abbr}")
+     * @Route("/project/{abbr}", name="projectdetail")
      * @Template("BotchlaJiraBundle:Projects:issues.html.twig")
      */
     public function projectDetailAction($abbr = null)
@@ -66,7 +66,7 @@ class DefaultController extends Controller
 
 
     /**
-     * @Route("/worklog/create")
+     * @Route("/worklog/create", name="createworklog")
      * @Template("BotchlaJiraBundle:Issues:createlog.html.twig")
      */
     public function createWorklogAction(Request $request)
@@ -117,7 +117,7 @@ class DefaultController extends Controller
 
 
     /**
-     * @Route("/today")
+     * @Route("/today", name="today")
      * @Template("BotchlaJiraBundle:Issues:today.html.twig")
      */
     public function todayAction()
@@ -162,11 +162,30 @@ class DefaultController extends Controller
 
 
     /**
-     * @Route("/project/export/{abbr}")
+     * @Route("/project/export/{abbr}", name="export")
      * @Template("BotchlaJiraBundle:Projects:issuesdetails.html.twig")
      */
     public function projectExportAction($abbr = null)
     {
+        return $this->generateExport($abbr);
+    }
+
+    /**
+     * @Route("/project/export/{abbr}/csv", name="csvexport")
+     */
+    public function jiraCsvExportAction($abbr = NULL) {
+        $exportarray = $this->generateExport($abbr);
+
+        $filename = $exportarray['project']->name."_".date("Y_m_d_H.i")."_export.csv";
+
+        $response = $this->render('BotchlaJiraBundle:Projects:csvexport.html.twig', array('data' => $exportarray['result'], 'totaltime'=>$exportarray['totaltime']));
+        $response->headers->set('Content-Type', 'text/csv');
+
+        $response->headers->set('Content-Disposition', 'attachment; filename='.$filename);
+        return $response;
+    }
+
+    private function generateExport($abbr = NULL){
         $issues = $this->curlGet($this->JIRA_URL.'search?jql=project="'.$abbr.'"');
         $project = $this->curlGet($this->JIRA_URL.'project/'.$abbr);
 
@@ -196,15 +215,14 @@ class DefaultController extends Controller
         $totaltimeFormatted = $this->formatTime($totaltime);
 
         return array(
-          'result' => $output_issues,
-          'project' => $project,
-          'totaltime' => $totaltimeFormatted
+            'result' => $output_issues,
+            'project' => $project,
+            'totaltime' => $totaltimeFormatted
         );
     }
 
-
     /**
-     * @Route("/timer")
+     * @Route("/timer", name="timer")
      * @Template("BotchlaJiraBundle:Timer:timerpage.html.twig")
      */
     public function timerAction($abbr = null)
@@ -225,7 +243,6 @@ class DefaultController extends Controller
             'time_timer' => $timerFormatted
         );
     }
-
 
     /**
      * @Route("/timer/start/")

@@ -7,8 +7,8 @@
     <table class="table table-condensed table-striped">
     {% for project in result %}
         <tr>
-          <td class="small"> <a href="{{ path('botchla_jira_default_projectdetail', {'abbr' : project.key })  }}">{{ project.key }}</a></td>
-          <td class="small"> <a href="{{ path('botchla_jira_default_projectexport', {'abbr' : project.key })  }}">{{ project.key }} Export</a></td>
+          <td class="small"> <a href="{{ url('projectdetail', {'abbr' : project.key })  }}">{{ project.key }}</a></td>
+          <td class="small"> <a href="{{ url('export', {'abbr' : project.key })  }}">{{ project.key }} Export</a></td>
           <td>{{ project.name }}</td>
           <td class="actions"></td>
         </tr>

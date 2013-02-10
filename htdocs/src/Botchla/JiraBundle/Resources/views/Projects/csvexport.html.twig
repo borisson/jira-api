@@ -1,0 +1,5 @@
+key,status,time,summary,description
+{% for issue in data %}
+    "{{ issue.key }}","{{ issue.fields.status.name }}","{% for worklog in issue.IssueWorklog %}{{ (worklog.timeSpentSeconds / 60 / 60 )|number_format(2) }} uur, {% else %}0, {% endfor %}","{{ issue.fields.summary|replace({'"': "\'"}) }}","{{ issue.fields.description|replace({'"': "\'"}) }}"
+{% endfor %}
+"Total:",,"{{ totaltime }} uur",,
