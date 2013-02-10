@@ -3,11 +3,13 @@ namespace Botchla\JiraBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Botchla\JiraBundle\Security\User;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Botchla\JiraBundle\Entity\Service\WebserviceService;
 
 class DefaultController extends Controller
 {
@@ -16,21 +18,12 @@ class DefaultController extends Controller
     private $PASSWORD = ''; #password
 
     private $session;
+    private $WebserviceService;
 
 
     public function __construct()
     {
-        if (file_exists('/vagrant/testfile.php')) {
-          include '/vagrant/testfile.php';
-          $this->JIRA_URL = $jira_url;
-          $this->LOGIN    = $jira_login;
-          $this->PASSWORD = $jira_pass;
-        }
-
-        if ($this->JIRA_URL == '') {
-            throw $this->createNotFoundException('JIRA url is not set');
-        }
-
+        $this->WebserviceService = new WebserviceService;
         // create session
         $session = new Session();
         $session->start();
@@ -43,7 +36,7 @@ class DefaultController extends Controller
      */
     public function projectAction()
     {
-        $projects = $this->curlGet($this->JIRA_URL.'project');
+        $projects = $this->WebserviceService->curlGet($this->JIRA_URL.'project');
 
         return array(
             'name' => 'Jira-test',
@@ -57,7 +50,7 @@ class DefaultController extends Controller
      */
     public function projectDetailAction($abbr = null)
     {
-        $issues = $this->curlGet($this->JIRA_URL.'search?jql=project="'.$abbr.'"+AND+assignee="'.$this->LOGIN.'"');
+        $issues = $this->WebserviceService->curlGet($this->JIRA_URL.'search?jql=project="'.$abbr.'"+AND+assignee="'.$this->LOGIN.'"');
 
         return array(
           'result' => $issues->issues
@@ -85,7 +78,7 @@ class DefaultController extends Controller
 
         $curlUrl = $this->JIRA_URL . 'issue/'. "TEAMB-82" .'/worklog';
 
-        // $curlResult = $this->curlPost($curlUrl, $newWorklog);
+        // $curlResult = $this->WebserviceService->curlPost($curlUrl, $newWorklog);
 
         return array(
           'name' => 'Jira-test',
@@ -109,7 +102,7 @@ class DefaultController extends Controller
 
         $curlUrl = $this->JIRA_URL . 'issue/';
 
-        // $curlResult = $this->curlPost($curlUrl, $newIssue);
+        // $curlResult = $this->WebserviceService->curlPost($curlUrl, $newIssue);
 
         return array(
           'name' => 'Jira-test'
@@ -124,7 +117,7 @@ class DefaultController extends Controller
     public function todayAction()
     {
 
-        $issues = $this->curlGet($this->JIRA_URL.'search?jql=updatedDate>startOfDay()+AND+updatedDate<endOfDay()+AND+(status+changed+by+"'.$this->LOGIN.'"+OR+assignee="'.$this->LOGIN.'")');
+        $issues = $this->WebserviceService->curlGet($this->JIRA_URL.'search?jql=updatedDate>startOfDay()+AND+updatedDate<endOfDay()+AND+(status+changed+by+"'.$this->LOGIN.'"+OR+assignee="'.$this->LOGIN.'")');
 
         $totaltime = 0;
         $output_issues = array();
@@ -132,7 +125,7 @@ class DefaultController extends Controller
             foreach( $issues->issues as $k => $issue_list) {
                 // generate url
                 $worklogurl = $this->JIRA_URL.'issue/'.$issue_list->key.'/worklog';
-                $worklog    = $this->curlGet($worklogurl);
+                $worklog    = $this->WebserviceService->curlGet($worklogurl);
 
                 $output_issues[$issue_list->key] = $issue_list;
 
@@ -168,8 +161,8 @@ class DefaultController extends Controller
      */
     public function projectExportAction($abbr = null)
     {
-        $issues = $this->curlGet($this->JIRA_URL.'search?jql=project="'.$abbr.'"');
-        $project = $this->curlGet($this->JIRA_URL.'project/'.$abbr);
+        $issues = $this->WebserviceService->curlGet($this->JIRA_URL.'search?jql=project="'.$abbr.'"');
+        $project = $this->WebserviceService->curlGet($this->JIRA_URL.'project/'.$abbr);
 
         $totaltime = 0;
         $output_issues = array();
@@ -177,7 +170,7 @@ class DefaultController extends Controller
             foreach( $issues->issues as $k => $issue_list) {
                 // generate url
                 $worklogurl = $this->JIRA_URL.'issue/'.$issue_list->key.'/worklog';
-                $worklog    = $this->curlGet($worklogurl);
+                $worklog    = $this->WebserviceService->curlGet($worklogurl);
 
                 $output_issues[$issue_list->key] = $issue_list;
 
@@ -257,7 +250,6 @@ class DefaultController extends Controller
 
         // reset timer
         $this->session->set('timer' , 0);
-        print $diff_time;
 
         // set timespent in session
         $this->session->set('LastTimer', $diff_time);
@@ -266,61 +258,6 @@ class DefaultController extends Controller
         return $this->redirect($this->generateUrl('botchla_jira_default_createworklog'));
     }
 
-
-    /**
-     * private function, do a curl action to JIRA
-     * @param  string   $url    url to curl to
-     * @return stdClass         result object
-     */
-    private function curlGet($url) {
-
-        // set username | password
-        $userNamePassWord = $this->LOGIN.':'.$this->PASSWORD;
-        $userNamePassWord64 = base64_encode($userNamePassWord);
-
-        // start curl
-        $curlHandle = curl_init();
-        curl_setopt($curlHandle, CURLOPT_USERPWD, $userNamePassWord);
-        curl_setopt($curlHandle, CURLOPT_URL, $url);
-        curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curlHandle, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($curlHandle, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($curlHandle, CURLOPT_SSL_VERIFYHOST, 0);
-
-        $result = (curl_exec($curlHandle));
-        $result_object = json_decode($result);
-        curl_close($curlHandle);
-        return $result_object;
-    }
-
-
-    /**
-     * private function, do a curl POST action to JIRA
-     * @param  string   $url            url to curl to
-     * @param  mixed    $curlData       data to be posted, array or stdClass
-     * @return stdClass                 result object
-     */
-    private function curlPost($url, $curlData) {
-        $data_string = json_encode($curlData);
-
-        // set username | password
-        $userNamePassWord = $this->LOGIN.':'.$this->PASSWORD;
-        $userNamePassWord64 = base64_encode($userNamePassWord);
-
-        // start curl
-        $curlHandle = curl_init($url);
-        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        curl_setopt($curlHandle, CURLOPT_USERPWD, $userNamePassWord);
-        curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curlHandle, CURLOPT_BINARYTRANSFER, true);
-        curl_setopt($curlHandle, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($curlHandle, CURLOPT_POST, 1);
-        curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $data_string);
-        $result = curl_exec($curlHandle);
-        curl_close($curlHandle);
-
-        return $result;
-    }
 
     /**
      * private function to format time (seconds to human readable)

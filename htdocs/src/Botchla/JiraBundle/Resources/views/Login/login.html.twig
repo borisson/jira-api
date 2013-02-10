@@ -1,47 +1,101 @@
-{% extends "BotchlaJiraBundle::base.html.twig" %}
 
-{% block title %}BotchlaJira : Login{% endblock %}
-{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="http://www.dawnclothing.com/" />
+  <meta charset="utf-8">
+  <title>Sign in &middot; Dawn clothing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-{% if error %}
-    <div class="alert">{{ error.message }}</div>
-{% endif %}
+  <!-- Le styles -->
+  <link href="public/css/bootstrap.min.css" rel="stylesheet">
+  <link href="public/css/bootstrap-responsive.min.css" rel="stylesheet">
+  <style type="text/css">
+  body {
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-color: #f5f5f5;
+}
 
-<h1>Please login</h1>
-<hr class="soften" />
-<form action="" method="post" class="form-horizontal">
-    <div class="control-group">
-        <label for="username" class="control-label">Username:</label>
-        <div class="controls">
-            <input type="text" id="username" name="_username" value="{{ last_username }}" />
+.form-signin {
+    max-width: 300px;
+    padding: 19px 29px 29px;
+    margin: 0 auto 20px;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.5);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.5);
+    box-shadow: 0 1px 2px rgba(0,0,0,.5);
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+    margin-bottom: 10px;
+}
+.form-signin input[type="text"],
+.form-signin input[type="password"] {
+    font-size: 16px;
+    height: auto;
+    margin-bottom: 15px;
+    padding: 7px 9px;
+}
+.alert {
+    margin-left: -30px;
+    margin-right: -30px;
+
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+}
+
+</style>
+</head>
+
+<body>
+  <div class="container">
+    <form action="" method="post" class="form-signin">
+        <h2>Login</h2>
+        <p>Please supply your login credentials and the jira-url you want to connect to</p>
+
+        <div class="control-group">
+            <label for="username" class="control-label">Username:</label>
+            <div class="controls">
+                <input type="text" id="username" class="input-xlarge" name="_username" value="{{ last_username }}" />
+            </div>
         </div>
-    </div>
 
-    <div class="control-group">
-        <label for="password" class="control-label">Password:</label>
-        <div class="controls">
-            <input type="password" id="password" name="_password" />
+        <div class="control-group">
+            <label for="password" class="control-label">Password:</label>
+            <div class="controls">
+                <input type="password" class="input-xlarge" id="password" name="_password" />
+            </div>
         </div>
-    </div>
 
-    <div class="control-group">
-        <label for="jiralocation" class="control-label">Jira-Location:</label>
-        <div class="controls">
-            <input type="text" id="jiralocation" name="jiralocation" value="{{ jiralocation }}" />
+        <div class="control-group">
+            <label for="jiralocation" class="control-label">Jira-Location:</label>
+            <div class="controls">
+                <input type="text" class="input-xlarge" id="jiralocation" name="jiralocation" value="{{ jiralocation }}" />
+            </div>
         </div>
-    </div>
 
-    <div class="control-group">
-        <div class="controls">
-            <label for="remember_me">Keep me logged in</label><input type="checkbox" id="remember_me" name="_remember_me" checked />
+        <div class="control-group">
+            <div class="controls">
+                <label for="remember_me">Keep me logged in</label><input type="checkbox" id="remember_me" name="_remember_me" checked />
+            </div>
         </div>
-    </div>
 
-    <div class="control-group">
-        <div class="controls">
-            <input type="submit" name="login" class="btn btn-large btn-primary" />
+        <div class="control-group">
+            <div class="controls">
+                <input type="submit" value="login" name="login" class="btn btn-large btn-primary" />
+            </div>
         </div>
-    </div>
 
-</form>
-{% endblock %}
+    </form>
+</div> <!-- /container -->
+
+</body>
+</html>

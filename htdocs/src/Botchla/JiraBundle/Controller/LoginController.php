@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Botchla\JiraBundle\Security\User\JiraUserProvider;
+use Botchla\JiraBundle\Entity\Service\WebserviceService;
 
 
 class LoginController extends Controller
@@ -32,7 +33,6 @@ class LoginController extends Controller
         // get post
         if ( count( $request->request->all() ) > 0 ) {
             $data = $request->request->all();
-            print_r($data);
             $jiraUser = new JiraUserProvider($data['_username'], $data['_password'], $data['jiralocation']);
         }
 

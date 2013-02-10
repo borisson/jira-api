@@ -6,19 +6,40 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
+use Botchla\JiraBundle\Entity\Service\WebserviceService;
+
 class JiraUserProvider implements UserProviderInterface
 {
+
+    private $username;
+    private $password;
+    private $jiraLocation;
+
+    public function __construct($username, $password, $jiraLocation) {
+        $this->username = $username;
+        $this->password = $password;
+        $this->jiraLocation = $jiraLocation;
+
+        return $this->loadUserByUsername($username);
+    }
+
+
     public function loadUserByUsername($username)
     {
         // make a call to your webservice here
-        $userData = true;
+        // $userData = true;
+        $user_array = array(
+            'username' => $this->username,
+            'password' => $this->password
+        );
+        $response = WebserviceService::curlPostLogin($this->jiraLocation . '/rest/auth/1/session', $user_array);
 
         // pretend it returns an array on success, false if there is no user
-        if ($userData) {
-            $password = '...';
-            $username = 'test.test';
-            $jira_url = 'http://jira.example.com/';
-            $salt     = 'tests';
+        if ( isset($response->session->value) ) {
+            $password = $this->password;
+            $username = $this->username;
+            $jira_url = $this->jiraLocation.'/';
+            $salt     = '';
             $roles    = array();
 
             return new JiraUser($username, $password, $jira_url, $salt, $roles);
