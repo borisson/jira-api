@@ -11,13 +11,13 @@ security:
         ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     providers:
-        in_memory:
-            memory:
-                users:
-                    user:  { password: userpass, roles: [ 'ROLE_USER' ] }
-                    admin: { password: adminpass, roles: [ 'ROLE_ADMIN' ] }
         jira:
             id: jira_user_provider
+        # in_memory:
+        #     memory:
+        #         users:
+        #             user:  { password: userpass, roles: [ 'ROLE_USER' ] }
+        #             admin: { password: adminpass, roles: [ 'ROLE_ADMIN' ] }
 
     firewalls:
         dev:
@@ -29,17 +29,16 @@ security:
             security: false
 
         secured_area:
-            pattern:    ^/demo/secured/
+            pattern:    ^/
+            security: true
             form_login:
-                check_path: /demo/secured/login_check
-                login_path: /demo/secured/login
+                check_path: /login_check
+                login_path: /login
             logout:
-                path:   /demo/secured/logout
-                target: /demo/
-            #anonymous: ~
-            #http_basic:
-            #    realm: "Secured Demo Area"
+                path:   /logout
+                target: /login
 
     access_control:
+        - { path: ^/, roles: ROLE_USER }
         #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
         #- { path: ^/_internal/secure, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }

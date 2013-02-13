@@ -15,12 +15,14 @@ class JiraUserProvider implements UserProviderInterface
     private $password;
     private $jiraLocation;
 
-    public function __construct($username, $password, $jiraLocation) {
+    public function __construct($username = null, $password = null, $jiraLocation = 'http://localhost') {
         $this->username = $username;
         $this->password = $password;
         $this->jiraLocation = $jiraLocation;
 
-        return $this->loadUserByUsername($username);
+        if ($username !== null) {
+            return $this->loadUserByUsername($username);
+        }
     }
 
 
