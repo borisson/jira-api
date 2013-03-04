@@ -16,7 +16,7 @@ use Botchla\JiraBundle\Entity\Service\WebserviceService;
 class LoginController extends Controller
 {
     /**
-     * @Route("/login")
+     * @Route("/login", name="login")
      * @Template("BotchlaJiraBundle:Login:login.html.twig")
      */
     public function loginAction()
@@ -33,7 +33,11 @@ class LoginController extends Controller
         // get post
         if ( count( $request->request->all() ) > 0 ) {
             $data = $request->request->all();
-            $jiraUser = new JiraUserProvider($data['_username'], $data['_password'], $data['jiralocation']);
+            try {
+                $jiraUser = new JiraUserProvider($data['_username'], $data['_password'], $data['jiralocation']);
+            } catch (Exception $e) {
+                print $e->getMessage();
+            }
         }
 
 

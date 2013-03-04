@@ -28,10 +28,11 @@ class JiraUserProvider implements UserProviderInterface
 
     public function loadUserByUsername($username)
     {
+        $username = ($username == null ? $this->username : $username);
         // make a call to your webservice here
         // $userData = true;
         $user_array = array(
-            'username' => $this->username,
+            'username' => $username,
             'password' => $this->password
         );
         $response = WebserviceService::curlPostLogin($this->jiraLocation . '/rest/auth/1/session', $user_array);
@@ -45,6 +46,10 @@ class JiraUserProvider implements UserProviderInterface
             $roles    = array();
 
             return new JiraUser($username, $password, $jira_url, $salt, $roles);
+        }
+
+        if (isset( $response->errorMessages )) {
+            throw new \Exception(sprintf("Error Processing Request, JIRA has thrown: %s" , $response->errorMessages[0] ), 1);
         }
 
         throw new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $username));
