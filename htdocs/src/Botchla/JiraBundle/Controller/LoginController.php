@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 use Botchla\JiraBundle\Security\User\JiraUserProvider;
 use Botchla\JiraBundle\Entity\Service\WebserviceService;
@@ -34,9 +35,20 @@ class LoginController extends Controller
         if ( count( $request->request->all() ) > 0 ) {
             $data = $request->request->all();
             try {
-                $jiraUser = new JiraUserProvider($data['_username'], $data['_password'], $data['jiralocation']);
+                $jiraUserProvider = new JiraUserProvider($data['_username'], $data['_password'], $data['jiralocation']);
             } catch (Exception $e) {
                 print $e->getMessage();
+            }
+
+            if (isset($jiraUserProvider)) {
+                $jiraUser = $jiraUserProvider->loadUserByUsername(null);
+
+                // get token
+                $token = new UsernamePasswordToken($jiraUser, null, 'JiraUserProvider', array('ROLE_USER'));
+                // Set token in security handler
+                $this->container->get('security.context')->setToken($token);
+                // And in session
+                $session->set('_security_secured_area',  serialize($token));
             }
         }
 
@@ -53,7 +65,7 @@ class LoginController extends Controller
 
 
         // return succes page if succesful
-        if ($error == null && $request->request->get('_username') != '') {
+        if ($error == null && isset($jiraUser) ) {
             return $this->render(
                 'BotchlaJiraBundle:Login:succes.html.twig'
             );

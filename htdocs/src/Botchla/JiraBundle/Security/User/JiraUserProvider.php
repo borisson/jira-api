@@ -19,10 +19,6 @@ class JiraUserProvider implements UserProviderInterface
         $this->username = $username;
         $this->password = $password;
         $this->jiraLocation = $jiraLocation;
-
-        if ($username !== null) {
-            return $this->loadUserByUsername($username);
-        }
     }
 
 
@@ -43,7 +39,7 @@ class JiraUserProvider implements UserProviderInterface
             $username = $this->username;
             $jira_url = $this->jiraLocation.'/';
             $salt     = '';
-            $roles    = array();
+            $roles    = array('ROLE_USER');
 
             return new JiraUser($username, $password, $jira_url, $salt, $roles);
         }
